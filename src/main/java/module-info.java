@@ -10,6 +10,7 @@ module agenda_crud {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires java.sql;
 
     exports GUI;
     opens GUI to javafx.fxml;
