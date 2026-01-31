@@ -14,5 +14,5 @@ module agenda_crud {
 
     exports GUI;
     opens GUI to javafx.fxml;
-
+    opens DB to javafx.base;
 }
