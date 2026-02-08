@@ -1,9 +1,6 @@
 package GUI;
 
-import DB.Persona;
-import DB.PersonaDAO;
-import DB.Telefono;
-import DB.TelefonoDAO;
+import DB.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -18,11 +15,22 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.shape.Circle;
 
 public class AgendaInterfaceController {
 
     @FXML private SplitPane splitContainer;
     @FXML private SplitPane listsContainer;
+
+    @FXML private TableView<Direccion> tablaDirecciones;
+    @FXML private TableColumn<Direccion, Integer> colDirectionId;
+    @FXML private TableColumn<Direccion, String> colStreet;
+    @FXML private TableColumn<Direccion, Void> colDirectionModifications;
+
+    @FXML private TableView<Persona_Direccion> tablaEnlaces;
+    @FXML private TableColumn<Persona_Direccion, Integer> colAssociatedPersonId;
+    @FXML private TableColumn<Persona_Direccion, Integer> colAssociatedDirectionId;
+    @FXML private TableColumn<Persona_Direccion, Void> colAssociatedModifications;
 
     @FXML private TableView<Persona> tablaPersonas;
     @FXML private TableColumn<Persona, Integer> colID;
@@ -43,6 +51,12 @@ public class AgendaInterfaceController {
     @FXML private TextField phoneTextField;
     @FXML private Button addPhoneButton;
 
+    @FXML private TextField directionTextField;
+    @FXML private Button addDirectionButton;
+
+    @FXML private Button associationButton;
+    @FXML private Circle indicator;
+
     private final PersonaDAO personaDAO = new PersonaDAO();
     private final TelefonoDAO telefonoDAO = new TelefonoDAO();
 
@@ -52,7 +66,6 @@ public class AgendaInterfaceController {
     @FXML
     private void initialize() {
 
-        // Configuración de columnas
         colID.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("nombre"));
 
@@ -60,13 +73,14 @@ public class AgendaInterfaceController {
         colPersonID.setCellValueFactory(new PropertyValueFactory<>("personaId"));
         colNumber.setCellValueFactory(new PropertyValueFactory<>("telefono"));
 
-        // Centrar y agregar padding a las columnas ID
         colID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
         colTelID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
         colPersonID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
 
         ajustarAnchoColumnasPersonas();
         ajustarAnchoColumnasTelefonos();
+        ajustarAnchoColumnasDirecciones();
+        ajustarAnchoColumnasPersonas_Direcciones();
 
         configurarBotonesPersonas();
         configurarBotonesTelefonos();
@@ -93,18 +107,36 @@ public class AgendaInterfaceController {
     }
 
     private void ajustarAnchoColumnasPersonas() {
-        // Establecer ancho inicial inmediatamente
         colID.setPrefWidth(100);
         colName.setPrefWidth(250);
         colModifications.setPrefWidth(200);
 
-        // Listener para ajuste dinámico
         tablaPersonas.widthProperty().addListener((obs, oldWidth, newWidth) -> {
             double usableWidth = newWidth.doubleValue() - 15;
 
             colID.setPrefWidth(usableWidth * 0.15);
             colName.setPrefWidth(usableWidth * 0.45);
             colModifications.setPrefWidth(usableWidth * 0.40);
+        });
+    }
+
+    private void ajustarAnchoColumnasDirecciones() {
+        tablaDirecciones.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+            double usableWidth = newWidth.doubleValue() - 15;
+
+            colDirectionId.setPrefWidth(usableWidth * 0.15);
+            colStreet.setPrefWidth(usableWidth * 0.45);
+            colDirectionModifications.setPrefWidth(usableWidth * 0.40);
+        });
+    }
+
+    private void ajustarAnchoColumnasPersonas_Direcciones() {
+        tablaEnlaces.widthProperty().addListener((obs, oldWidth, newWidth) -> {
+            double usableWidth = newWidth.doubleValue() - 15;
+
+            colAssociatedPersonId.setPrefWidth(usableWidth * 0.30);
+            colAssociatedDirectionId.setPrefWidth(usableWidth * 0.30);
+            colAssociatedModifications.setPrefWidth(usableWidth * 0.40);
         });
     }
 
