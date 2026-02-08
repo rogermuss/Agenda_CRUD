@@ -43,30 +43,67 @@
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                     <children>
-                        <SplitPane fx:id="listsContainer" dividerPositions="0.62" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <SplitPane fx:id="listsContainer" dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <items>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                     <children>
-                                        <TableView fx:id="tablaPersonas" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columns>
-                                                <TableColumn fx:id="colID" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="ID" />
-                                                <TableColumn fx:id="colName" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Nombre" />
-                                                <TableColumn fx:id="colAdress" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Direccion" />
-                                                <TableColumn fx:id="colModifications" prefWidth="75.0" text="Modificaciones" />
-                                            </columns>
-                                        </TableView>
+                              <SplitPane fx:id="listsContainer11" dividerPositions="0.5" orientation="VERTICAL" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <items>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                                    <TableView fx:id="tablaPersonas" layoutX="-8.0" layoutY="47.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="-8.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                        <columns>
+                                                            <TableColumn fx:id="colID" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="ID" />
+                                                            <TableColumn fx:id="colName" maxWidth="1.7976931348623157E308" minWidth="-Infinity" text="Nombre" />
+                                                            <TableColumn fx:id="colModifications" prefWidth="75.0" text="Modificaciones" />
+                                                        </columns>
+                                                    </TableView>
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <TableView fx:id="tablaDirecciones" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <columns>
+                                                <TableColumn fx:id="colTelID11" prefWidth="75.0" text="ID" />
+                                                <TableColumn fx:id="colPersonID11" prefWidth="75.0" text="Calle" />
+                                                <TableColumn fx:id="colPhoneModifications11" prefWidth="75.0" text="Modificaciones" />
+                                             </columns>
+                                          </TableView>
+                                       </children>
+                                    </AnchorPane>
+                                 </items>
+                              </SplitPane>
                                     </children>
                                 </AnchorPane>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                     <children>
-                                        <TableView fx:id="tablaTelefonos" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                            <columns>
-                                                <TableColumn fx:id="colTelID" prefWidth="75.0" text="ID" />
-                                                <TableColumn fx:id="colPersonID" prefWidth="75.0" text="Persona ID" />
-                                                <TableColumn fx:id="colNumber" prefWidth="75.0" text="Numero" />
-                                                <TableColumn fx:id="colPhoneModifications" prefWidth="75.0" text="Modificaciones" />
-                                            </columns>
-                                        </TableView>
+                              <SplitPane fx:id="listsContainer1" dividerPositions="0.5" orientation="VERTICAL" prefHeight="160.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <items>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                                    <TableView fx:id="tablaTelefonos" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                        <columns>
+                                                            <TableColumn fx:id="colTelID" prefWidth="75.0" text="ID" />
+                                                            <TableColumn fx:id="colPersonID" prefWidth="75.0" text="Persona ID" />
+                                                            <TableColumn fx:id="colNumber" prefWidth="75.0" text="Numero" />
+                                                            <TableColumn fx:id="colPhoneModifications" prefWidth="75.0" text="Modificaciones" />
+                                                        </columns>
+                                                    </TableView>
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                       <children>
+                                          <TableView fx:id="tablaEnlaces" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <columns>
+                                                <TableColumn fx:id="colTelID1" prefWidth="75.0" text="Direccion ID" />
+                                                <TableColumn fx:id="colPersonID1" prefWidth="75.0" text="Persona ID" />
+                                                <TableColumn fx:id="colPhoneModifications1" prefWidth="75.0" text="Modificaciones" />
+                                             </columns>
+                                          </TableView>
+                                       </children>
+                                    </AnchorPane>
+                                 </items>
+                              </SplitPane>
                                     </children>
                                 </AnchorPane>
                             </items>

@@ -12,11 +12,12 @@ import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
 
 import java.sql.SQLException;
+import java.util.List;
+
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 
 public class AgendaInterfaceController {
 
@@ -26,7 +27,6 @@ public class AgendaInterfaceController {
     @FXML private TableView<Persona> tablaPersonas;
     @FXML private TableColumn<Persona, Integer> colID;
     @FXML private TableColumn<Persona, String> colName;
-    @FXML private TableColumn<Persona, String> colAdress;
     @FXML private TableColumn<Persona, Void> colModifications;
 
     @FXML private TableView<Telefono> tablaTelefonos;
@@ -35,52 +35,44 @@ public class AgendaInterfaceController {
     @FXML private TableColumn<Telefono, String> colNumber;
     @FXML private TableColumn<Telefono, Void> colPhoneModifications;
 
-    // Campos para agregar/modificar personas
+    // Campos personas
     @FXML private TextField nameTextField;
-    @FXML private TextField directionTextField;
     @FXML private Button addPersonButton;
 
-    // Campos para agregar/modificar teléfonos
+    // Campos telefonos
     @FXML private TextField phoneTextField;
     @FXML private Button addPhoneButton;
 
     private final PersonaDAO personaDAO = new PersonaDAO();
     private final TelefonoDAO telefonoDAO = new TelefonoDAO();
 
-    // Variables para modo edición
     private Persona personaEnEdicion = null;
     private Telefono telefonoEnEdicion = null;
 
     @FXML
     private void initialize() {
 
-        //splitContainer.setMouseTransparent(true);
-        //listsContainer.setMouseTransparent(true);
-
-        // Configurar columnas de Personas
+        // Configuración de columnas
         colID.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colAdress.setCellValueFactory(new PropertyValueFactory<>("direccion"));
 
-        // Configurar columnas de Teléfonos
         colTelID.setCellValueFactory(new PropertyValueFactory<>("id"));
         colPersonID.setCellValueFactory(new PropertyValueFactory<>("personaId"));
         colNumber.setCellValueFactory(new PropertyValueFactory<>("telefono"));
 
-        ajustarAnchoColumnasPersonas();
+        // Centrar y agregar padding a las columnas ID
+        colID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
+        colTelID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
+        colPersonID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
 
+        ajustarAnchoColumnasPersonas();
         ajustarAnchoColumnasTelefonos();
 
-
-        // Configurar botones de modificación y eliminacion para Personas
         configurarBotonesPersonas();
-
-        // Configurar botones de modificación y eliminación para Telefonos
         configurarBotonesTelefonos();
 
         cargarPersonas();
 
-        // Al seleccionar persona - cargar telefonos
         tablaPersonas.getSelectionModel().selectedItemProperty().addListener((obs, oldP, newP) -> {
             if (newP != null) {
                 cargarTelefonos(newP.getId());
@@ -89,50 +81,37 @@ public class AgendaInterfaceController {
             }
         });
 
-        // Boton para agregar/modificar persona
         addPersonButton.setOnAction(e -> {
-            if (personaEnEdicion == null) {
-                agregarPersona();
-            } else {
-                modificarPersona();
-            }
+            if (personaEnEdicion == null) agregarPersona();
+            else modificarPersona();
         });
 
-        // Boton para agregar/modificar telefono
         addPhoneButton.setOnAction(e -> {
-            if (telefonoEnEdicion == null) {
-                agregarTelefono();
-            } else {
-                modificarTelefono();
-            }
+            if (telefonoEnEdicion == null) agregarTelefono();
+            else modificarTelefono();
         });
     }
 
     private void ajustarAnchoColumnasPersonas() {
+        // Establecer ancho inicial inmediatamente
+        colID.setPrefWidth(100);
+        colName.setPrefWidth(250);
+        colModifications.setPrefWidth(200);
+
+        // Listener para ajuste dinámico
         tablaPersonas.widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            double tableWidth = newWidth.doubleValue();
+            double usableWidth = newWidth.doubleValue() - 15;
 
-            // Resta el ancho de la barra de scroll (si existe)
-            double scrollBarWidth = 15;
-            double usableWidth = tableWidth - scrollBarWidth;
-
-            // Distribucion del ancho entre las columnas
-            colID.setPrefWidth(usableWidth * 0.10);
-            colName.setPrefWidth(usableWidth * 0.30);
-            colAdress.setPrefWidth(usableWidth * 0.30);
-            colModifications.setPrefWidth(usableWidth * 0.30);
+            colID.setPrefWidth(usableWidth * 0.15);
+            colName.setPrefWidth(usableWidth * 0.45);
+            colModifications.setPrefWidth(usableWidth * 0.40);
         });
     }
 
     private void ajustarAnchoColumnasTelefonos() {
         tablaTelefonos.widthProperty().addListener((obs, oldWidth, newWidth) -> {
-            double tableWidth = newWidth.doubleValue();
+            double usableWidth = newWidth.doubleValue() - 15;
 
-            // Resta el ancho de la barra de scroll (si existe)
-            double scrollBarWidth = 15;
-            double usableWidth = tableWidth - scrollBarWidth;
-
-            // Distribuye el ancho entre las columnas
             colTelID.setPrefWidth(usableWidth * 0.15);
             colPersonID.setPrefWidth(usableWidth * 0.15);
             colNumber.setPrefWidth(usableWidth * 0.40);
@@ -140,17 +119,18 @@ public class AgendaInterfaceController {
         });
     }
 
-    //Metodo para configutar los botones y sus acciones (styles & actionListeners)
     private void configurarBotonesPersonas() {
         colModifications.setCellFactory(param -> new TableCell<>() {
             private final Button btnModificar = new Button("Modificar");
             private final Button btnEliminar = new Button("Eliminar");
+
             private final HBox pane = new HBox(10, btnModificar, btnEliminar);
 
             {
+                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;"); // verde
+                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;"); // rojo
+
                 pane.setAlignment(Pos.CENTER);
-                btnModificar.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-                btnEliminar.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
 
                 btnModificar.setOnAction(event -> {
                     Persona persona = getTableView().getItems().get(getIndex());
@@ -171,7 +151,6 @@ public class AgendaInterfaceController {
         });
     }
 
-    //Metodo para configutar los botones y sus acciones (styles & actionListeners) pero para telefonos
     private void configurarBotonesTelefonos() {
         colPhoneModifications.setCellFactory(param -> new TableCell<>() {
             private final Button btnModificar = new Button("Modificar");
@@ -179,9 +158,10 @@ public class AgendaInterfaceController {
             private final HBox pane = new HBox(10, btnModificar, btnEliminar);
 
             {
+                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;"); // verde
+                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;"); // rojo
+
                 pane.setAlignment(Pos.CENTER);
-                btnModificar.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
-                btnEliminar.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
 
                 btnModificar.setOnAction(event -> {
                     Telefono telefono = getTableView().getItems().get(getIndex());
@@ -202,17 +182,25 @@ public class AgendaInterfaceController {
         });
     }
 
-    //Mando a llamar el metodo de PersonaDAO para cargar las personas de la BD
-    //Luego las agrego a la tabla de Personas
     private void cargarPersonas() {
         try {
-            tablaPersonas.getItems().setAll(personaDAO.getAll());
+            List<Persona> personas = personaDAO.getAll();
+
+            // DEBUG: Imprimir en consola lo que se carga
+            System.out.println("=== CARGANDO PERSONAS ===");
+            System.out.println("Total personas encontradas: " + personas.size());
+            for (Persona p : personas) {
+                System.out.println("ID: " + p.getId() + " | Nombre: " + p.getNombre());
+            }
+            System.out.println("========================");
+
+            tablaPersonas.getItems().setAll(personas);
+            tablaPersonas.refresh();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    //Mando a llamar el metodo de personaDAO para cargar los telefonos de una persona seleccionada
     private void cargarTelefonos(int personaId) {
         try {
             tablaTelefonos.getItems().setAll(telefonoDAO.getAllByPersonaId(personaId));
@@ -221,20 +209,13 @@ public class AgendaInterfaceController {
         }
     }
 
-    // OPERACIONES CRUD PARA PERSONAS
-
-    //Obtengo los datos del formulario y los inserto en la BD
     private void agregarPersona() {
         String nombre = nameTextField.getText().trim();
-        String direccion = directionTextField.getText().trim();
 
-        if (nombre.isEmpty()) {
-            System.out.println("El nombre no puede estar vacío");
-            return;
-        }
+        if (nombre.isEmpty()) return;
 
         try {
-            Persona nuevaPersona = new Persona(0, nombre, direccion);
+            Persona nuevaPersona = new Persona(0, nombre);
             personaDAO.insert(nuevaPersona);
             cargarPersonas();
             limpiarCamposPersona();
@@ -243,31 +224,22 @@ public class AgendaInterfaceController {
         }
     }
 
-    //La persona seleccionada se pasa como parametro para poder modificarla
     private void activarModoEdicionPersona(Persona persona) {
         personaEnEdicion = persona;
         nameTextField.setText(persona.getNombre());
-        directionTextField.setText(persona.getDireccion());
+        addPersonButton.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white;");
+
         addPersonButton.setText("Guardar Cambios");
-        addPersonButton.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white;");
     }
 
-    //Dependiendo de si hay un persona seleccionada o no, se llama al metodo de
-    // personaDAO para modificarla o eliminarla
     private void modificarPersona() {
         if (personaEnEdicion == null) return;
 
         String nombre = nameTextField.getText().trim();
-        String direccion = directionTextField.getText().trim();
-
-        if (nombre.isEmpty()) {
-            System.out.println("El nombre no puede estar vacío");
-            return;
-        }
+        if (nombre.isEmpty()) return;
 
         try {
             personaEnEdicion.setNombre(nombre);
-            personaEnEdicion.setDireccion(direccion);
             personaDAO.update(personaEnEdicion);
             cargarPersonas();
             limpiarCamposPersona();
@@ -276,7 +248,6 @@ public class AgendaInterfaceController {
         }
     }
 
-    //Elimino la persona seleccionada de la BD y la actualizo en la tabla
     private void eliminarPersona(Persona persona) {
         try {
             personaDAO.delete(persona.getId());
@@ -287,29 +258,19 @@ public class AgendaInterfaceController {
         }
     }
 
-    //METODO para limpiar los campos del formulario
     private void limpiarCamposPersona() {
         personaEnEdicion = null;
         nameTextField.clear();
-        directionTextField.clear();
         addPersonButton.setText("Agregar");
         addPersonButton.setStyle("-fx-background-color: #FFFFFF;");
     }
 
-    // OPERACIONES CRUD PARA TELEFONOS, lo mismo que arriba, pero para los telefonos
-
     private void agregarTelefono() {
         Persona personaSeleccionada = tablaPersonas.getSelectionModel().getSelectedItem();
-        if (personaSeleccionada == null) {
-            System.out.println("Debe seleccionar una persona primero");
-            return;
-        }
+        if (personaSeleccionada == null) return;
 
         String numeroTelefono = phoneTextField.getText().trim();
-        if (numeroTelefono.isEmpty()) {
-            System.out.println("El numero de telefono no puede estar vacío");
-            return;
-        }
+        if (numeroTelefono.isEmpty()) return;
 
         try {
             Telefono nuevoTelefono = new Telefono(personaSeleccionada.getId(), numeroTelefono);
@@ -324,18 +285,15 @@ public class AgendaInterfaceController {
     private void activarModoEdicionTelefono(Telefono telefono) {
         telefonoEnEdicion = telefono;
         phoneTextField.setText(telefono.getTelefono());
+        addPhoneButton.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white;");
         addPhoneButton.setText("Guardar Cambios");
-        addPhoneButton.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white;");
     }
 
     private void modificarTelefono() {
         if (telefonoEnEdicion == null) return;
 
         String numeroTelefono = phoneTextField.getText().trim();
-        if (numeroTelefono.isEmpty()) {
-            System.out.println("El numero de telefono no puede estar vacío");
-            return;
-        }
+        if (numeroTelefono.isEmpty()) return;
 
         try {
             telefonoEnEdicion.setTelefono(numeroTelefono);
