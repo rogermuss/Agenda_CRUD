@@ -62,13 +62,20 @@ public class DireccionDAO {
     }
 
     public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM Direccion WHERE id_direccion = ?";
+        String deleteRelation = "DELETE FROM persona_direccion WHERE id_direccion = ?";
+        String deleteDireccion = "DELETE FROM Direccion WHERE id_direccion = ?";
 
-        try (Connection conn = ConnectionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ps.executeUpdate();
+        try (Connection conn = ConnectionDB.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement psRel = conn.prepareStatement(deleteRelation)) {
+                psRel.setInt(1, id);
+                psRel.executeUpdate();
+            }
+            try (PreparedStatement psDir = conn.prepareStatement(deleteDireccion)) {
+                psDir.setInt(1, id);
+                psDir.executeUpdate();
+            }
+            conn.commit();
         }
     }
 }

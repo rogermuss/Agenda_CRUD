@@ -26,7 +26,29 @@ public class Persona_DireccionDAO {
         return lista;
     }
 
+    public boolean existe(int id_persona, int id_direccion) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Persona_Direccion WHERE id_persona = ? AND id_direccion = ?";
+
+        try (Connection conn = ConnectionDB.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id_persona);
+            ps.setInt(2, id_direccion);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
+    }
+
     public int insert(Persona_Direccion pd) throws SQLException {
+        if (existe(pd.getId_persona(), pd.getId_direccion())) {
+            return 0;
+        }
+
         String sql = "INSERT INTO Persona_Direccion(id_persona, id_direccion) VALUES (?, ?)";
 
         try (Connection conn = ConnectionDB.getConnection();
@@ -35,7 +57,7 @@ public class Persona_DireccionDAO {
             ps.setInt(1, pd.getId_persona());
             ps.setInt(2, pd.getId_direccion());
 
-            return ps.executeUpdate(); // retorna 1 si se insertó
+            return ps.executeUpdate();
         }
     }
 

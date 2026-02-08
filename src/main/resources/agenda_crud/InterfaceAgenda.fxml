@@ -35,7 +35,10 @@
                               <Insets right="10.0" />
                            </GridPane.margin>
                         </Button>
-                        <TextField fx:id="nameTextField" prefHeight="26.0" prefWidth="411.0" promptText="Write a name" GridPane.columnIndex="3" />
+                        <TextField fx:id="nameTextField" prefHeight="26.0" prefWidth="411.0" promptText="Write a name" GridPane.columnIndex="3">
+                           <GridPane.margin>
+                              <Insets right="20.0" />
+                           </GridPane.margin></TextField>
                         <Button fx:id="addPhoneButton" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" style="-fx-background-color: #FFFFFF;" text="Agregar">
                            <GridPane.margin>
                               <Insets right="10.0" />
@@ -46,13 +49,19 @@
                               <Insets right="10.0" />
                            </GridPane.margin>
                         </Button>
-                        <TextField fx:id="phoneTextField" prefWidth="470.0" promptText="Write a phone number" GridPane.columnIndex="1" />
+                        <TextField fx:id="phoneTextField" prefWidth="470.0" promptText="Write a phone number" GridPane.columnIndex="1">
+                           <GridPane.margin>
+                              <Insets right="20.0" />
+                           </GridPane.margin></TextField>
                         <Button fx:id="addDirectionButton" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" style="-fx-background-color: #FFFFFF;" text="Agregar" GridPane.columnIndex="2" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets right="10.0" />
                            </GridPane.margin>
                         </Button>
-                        <TextField fx:id="directionTextField" prefHeight="26.0" prefWidth="470.0" promptText="Write a direction" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                        <TextField fx:id="directionTextField" prefHeight="26.0" prefWidth="470.0" promptText="Write a direction" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                           <GridPane.margin>
+                              <Insets right="20.0" />
+                           </GridPane.margin></TextField>
                         <Circle fx:id="indicator" fill="#ff1f1f" radius="13.0" stroke="#f7f7f7" strokeType="INSIDE" GridPane.rowIndex="1">
                            <GridPane.margin>
                               <Insets right="26.0" />

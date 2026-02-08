@@ -59,9 +59,15 @@ public class AgendaInterfaceController {
 
     private final PersonaDAO personaDAO = new PersonaDAO();
     private final TelefonoDAO telefonoDAO = new TelefonoDAO();
+    private final DireccionDAO direccionDAO = new DireccionDAO();
+    private final Persona_DireccionDAO persona_direccionDAO = new Persona_DireccionDAO();
 
     private Persona personaEnEdicion = null;
     private Telefono telefonoEnEdicion = null;
+    private Direccion direccionEnEdicion = null;
+
+    private boolean hayPersonaSeleccionada = false;
+    private boolean hayDireccionSeleccionada = false;
 
     @FXML
     private void initialize() {
@@ -73,9 +79,14 @@ public class AgendaInterfaceController {
         colPersonID.setCellValueFactory(new PropertyValueFactory<>("personaId"));
         colNumber.setCellValueFactory(new PropertyValueFactory<>("telefono"));
 
+        colDirectionId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colStreet.setCellValueFactory(new PropertyValueFactory<>("calle"));
+
         colID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
         colTelID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
         colPersonID.setStyle("-fx-alignment: CENTER; -fx-padding: 0 10 0 10;");
+
+        activateIndicator();
 
         ajustarAnchoColumnasPersonas();
         ajustarAnchoColumnasTelefonos();
@@ -84,16 +95,30 @@ public class AgendaInterfaceController {
 
         configurarBotonesPersonas();
         configurarBotonesTelefonos();
+        configurarBotonesDirecciones();
+        configurarBotonesPersonas_Direcciones();
 
         cargarPersonas();
+        cargarDirecciones();
+        cargarPersonas_Direcciones();
 
         tablaPersonas.getSelectionModel().selectedItemProperty().addListener((obs, oldP, newP) -> {
             if (newP != null) {
+                hayPersonaSeleccionada = true;
                 cargarTelefonos(newP.getId());
             } else {
+                hayPersonaSeleccionada = false;
                 tablaTelefonos.getItems().clear();
             }
+            activateIndicator();
         });
+
+        tablaDirecciones.getSelectionModel().selectedItemProperty().addListener((obs, oldP, newP) -> {
+            hayDireccionSeleccionada = newP != null;
+            activateIndicator();
+        });
+
+
 
         addPersonButton.setOnAction(e -> {
             if (personaEnEdicion == null) agregarPersona();
@@ -104,6 +129,20 @@ public class AgendaInterfaceController {
             if (telefonoEnEdicion == null) agregarTelefono();
             else modificarTelefono();
         });
+
+        addDirectionButton.setOnAction(e -> {
+            if(direccionEnEdicion == null) agregarDireccion();
+            else modificarDireccion();
+        });
+
+        associationButton.setOnAction(e -> {
+            agregarAsociacion();
+        });
+    }
+
+    private void activateIndicator(){
+        if(hayPersonaSeleccionada && hayDireccionSeleccionada) indicator.setStyle("-fx-fill: #2ecc71;");
+        else indicator.setStyle("-fx-fill: #e74c3c;");
     }
 
     private void ajustarAnchoColumnasPersonas() {
@@ -203,6 +242,69 @@ public class AgendaInterfaceController {
                 btnEliminar.setOnAction(event -> {
                     Telefono telefono = getTableView().getItems().get(getIndex());
                     eliminarTelefono(telefono);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : pane);
+            }
+        });
+    }
+
+    private void configurarBotonesDirecciones() {
+        colDirectionModifications.setCellFactory(param -> new TableCell<>() {
+            private final Button btnModificar = new Button("Modificar");
+            private final Button btnEliminar = new Button("Eliminar");
+
+            private final HBox pane = new HBox(10, btnModificar, btnEliminar);
+
+            {
+                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;"); // verde
+                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;"); // rojo
+
+                pane.setAlignment(Pos.CENTER);
+
+                btnModificar.setOnAction(event -> {
+                    Direccion d = getTableView().getItems().get(getIndex());
+                    activarModoEdicionDirecciones(d);
+                });
+
+                btnEliminar.setOnAction(event -> {
+                    Direccion d = getTableView().getItems().get(getIndex());
+                    eliminarDireccion(d);
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : pane);
+            }
+        });
+    }
+
+    private void configurarBotonesPersonas_Direcciones() {
+        // Configurar las cellValueFactory para que las columnas muestren los datos
+        colAssociatedPersonId.setCellValueFactory(new PropertyValueFactory<>("id_persona"));
+        colAssociatedDirectionId.setCellValueFactory(new PropertyValueFactory<>("id_direccion"));
+
+        // Configurar el botón de eliminar
+        colAssociatedModifications.setCellFactory(param -> new TableCell<>() {
+            private final Button btnEliminar = new Button("Eliminar");
+
+            private final HBox pane = new HBox(10, btnEliminar);
+
+            {
+                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;"); // rojo
+
+                pane.setAlignment(Pos.CENTER);
+
+
+                btnEliminar.setOnAction(event -> {
+                    Persona_Direccion pd = getTableView().getItems().get(getIndex());
+                    eliminarPersona_Direccion(pd);
                 });
             }
 
@@ -351,5 +453,140 @@ public class AgendaInterfaceController {
         phoneTextField.clear();
         addPhoneButton.setText("Agregar");
         addPhoneButton.setStyle("-fx-background-color: #FFFFFF;");
+    }
+
+
+
+
+
+    private void activarModoEdicionDirecciones(Direccion direccion) {
+        direccionEnEdicion = direccion;
+        directionTextField.setText(direccion.getCalle());
+        addDirectionButton.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white;");
+        addDirectionButton.setText("Guardar Cambios");
+    }
+
+    private void cargarDirecciones() {
+        try {
+            List<Direccion> direcciones = direccionDAO.getAll();
+
+            System.out.println("=== CARGANDO DIRECCIONES ===");
+            System.out.println("Total Direcciones encontradas: " + direcciones.size());
+            for (Direccion d : direcciones) {
+                System.out.println("ID: " + d.getId() + " | Calle: " + d.getCalle());
+            }
+            System.out.println("========================");
+
+            tablaDirecciones.getItems().setAll(direcciones);
+            tablaDirecciones.refresh();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void eliminarDireccion(Direccion d) {
+        try {
+            direccionDAO.delete(d.getId());
+            cargarDirecciones();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void agregarDireccion() {
+        String calle = directionTextField.getText().trim();
+
+        if (calle.isEmpty()) return;
+
+        try {
+            Direccion nuevaDireccion = new Direccion(0, calle);
+            direccionDAO.insert(nuevaDireccion);
+            cargarDirecciones();
+            limpiarCampoDireccion();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void limpiarCampoDireccion() {
+        direccionEnEdicion = null;
+        directionTextField.clear();
+        addDirectionButton.setText("Agregar");
+        addDirectionButton.setStyle("-fx-background-color: #FFFFFF;");
+    }
+
+    private void modificarDireccion() {
+        if (direccionEnEdicion == null) return;
+
+        String calle = directionTextField.getText().trim();
+        if (calle.isEmpty()) return;
+
+        try {
+            direccionEnEdicion.setCalle(calle);
+            direccionDAO.update(direccionEnEdicion);
+            cargarDirecciones();
+            limpiarCampoDireccion();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
+//PARTE FINAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL
+
+
+
+    private void eliminarPersona_Direccion(Persona_Direccion pd) {
+        try {
+            persona_direccionDAO.delete(pd.getId_persona(), pd.getId_direccion());
+            cargarPersonas_Direcciones(); // ← LÍNEA CORREGIDA (antes era cargarDirecciones())
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void cargarPersonas_Direcciones() {
+        try {
+            List<Persona_Direccion> personaDirecciones = persona_direccionDAO.getAll();
+
+            System.out.println("=== CARGANDO ASOCIACIONES ===");
+            System.out.println("Total asociaciones encontradas: " + personaDirecciones.size());
+            for (Persona_Direccion pd : personaDirecciones) {
+                System.out.println("ID Persona: " + pd.getId_persona() + " | ID Direccion: " + pd.getId_direccion());
+            }
+            System.out.println("========================");
+
+            tablaEnlaces.getItems().setAll(personaDirecciones);
+            tablaEnlaces.refresh();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void agregarAsociacion() {
+        Persona personaSeleccionada = tablaPersonas.getSelectionModel().getSelectedItem();
+        Direccion direccionSeleccionada = tablaDirecciones.getSelectionModel().getSelectedItem();
+
+        // Verificar que ambos estén seleccionados
+        if (personaSeleccionada == null || direccionSeleccionada == null) {
+            System.out.println("ERROR: Debe seleccionar una persona y una dirección");
+            return;
+        }
+
+        int personaId = personaSeleccionada.getId();
+        int direccionId = direccionSeleccionada.getId();
+
+        try {
+            Persona_Direccion nuevaPD = new Persona_Direccion(personaId, direccionId);
+            persona_direccionDAO.insert(nuevaPD);
+            cargarPersonas_Direcciones();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
