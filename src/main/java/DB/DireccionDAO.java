@@ -1,10 +1,12 @@
 package DB;
 
+import repositories.IRepository;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DireccionDAO {
+public class DireccionDAO implements IRepository<Direccion> {
     public List<Direccion> getAll() throws SQLException {
         List<Direccion> lista = new ArrayList<>();
 

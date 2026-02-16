@@ -1,10 +1,12 @@
 package DB;
 
+import repositories.IRepository;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Persona_DireccionDAO {
+public class Persona_DireccionDAO implements IRepository<Persona_Direccion> {
     public List<Persona_Direccion> getAll() throws SQLException {
         List<Persona_Direccion> lista = new ArrayList<>();
 
@@ -59,6 +61,16 @@ public class Persona_DireccionDAO {
 
             return ps.executeUpdate();
         }
+    }
+
+    @Override
+    public void update(Persona_Direccion entity) throws SQLException {
+
+    }
+
+    @Override
+    public void delete(int id) throws SQLException {
+
     }
 
 

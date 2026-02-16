@@ -1,6 +1,13 @@
 package GUI;
 
 import DB.*;
+// ========== AGREGAR ESTOS IMPORTS ==========
+import services.PersonaService;
+import validators.PersonaValidator;
+import repositories.IPersonaRepository;
+import repositories.IValidator;
+// ===========================================
+
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -57,7 +64,15 @@ public class AgendaInterfaceController {
     @FXML private Button associationButton;
     @FXML private Circle indicator;
 
-    private final PersonaDAO personaDAO = new PersonaDAO();
+    // ========== CAMBIO 1: REEMPLAZAR PersonaDAO por PersonaService ==========
+    // ELIMINAR ESTA LÍNEA:
+    // private final PersonaDAO personaDAO = new PersonaDAO();
+
+    // AGREGAR ESTA LÍNEA:
+    private PersonaService personaService;
+    // ========================================================================
+
+    // Los demás DAOs quedan igual
     private final TelefonoDAO telefonoDAO = new TelefonoDAO();
     private final DireccionDAO direccionDAO = new DireccionDAO();
     private final Persona_DireccionDAO persona_direccionDAO = new Persona_DireccionDAO();
@@ -71,6 +86,13 @@ public class AgendaInterfaceController {
 
     @FXML
     private void initialize() {
+
+        // ========== CAMBIO 2: INICIALIZAR PersonaService AL INICIO ==========
+        // AGREGAR ESTAS 3 LÍNEAS AL PRINCIPIO:
+        IPersonaRepository personaRepo = new PersonaDAO();
+        IValidator<Persona> personaValidator = new PersonaValidator();
+        personaService = new PersonaService(personaRepo, personaValidator);
+        // ====================================================================
 
         colID.setCellValueFactory(new PropertyValueFactory<>("id"));
         colName.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -198,8 +220,8 @@ public class AgendaInterfaceController {
             private final HBox pane = new HBox(10, btnModificar, btnEliminar);
 
             {
-                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;"); // verde
-                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;"); // rojo
+                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
+                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
 
                 pane.setAlignment(Pos.CENTER);
 
@@ -229,8 +251,8 @@ public class AgendaInterfaceController {
             private final HBox pane = new HBox(10, btnModificar, btnEliminar);
 
             {
-                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;"); // verde
-                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;"); // rojo
+                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
+                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
 
                 pane.setAlignment(Pos.CENTER);
 
@@ -261,8 +283,8 @@ public class AgendaInterfaceController {
             private final HBox pane = new HBox(10, btnModificar, btnEliminar);
 
             {
-                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;"); // verde
-                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;"); // rojo
+                btnModificar.setStyle("-fx-background-color: #2ecc71; -fx-text-fill: white;");
+                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
 
                 pane.setAlignment(Pos.CENTER);
 
@@ -286,21 +308,18 @@ public class AgendaInterfaceController {
     }
 
     private void configurarBotonesPersonas_Direcciones() {
-        // Configurar las cellValueFactory para que las columnas muestren los datos
         colAssociatedPersonId.setCellValueFactory(new PropertyValueFactory<>("id_persona"));
         colAssociatedDirectionId.setCellValueFactory(new PropertyValueFactory<>("id_direccion"));
 
-        // Configurar el botón de eliminar
         colAssociatedModifications.setCellFactory(param -> new TableCell<>() {
             private final Button btnEliminar = new Button("Eliminar");
 
             private final HBox pane = new HBox(10, btnEliminar);
 
             {
-                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;"); // rojo
+                btnEliminar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
 
                 pane.setAlignment(Pos.CENTER);
-
 
                 btnEliminar.setOnAction(event -> {
                     Persona_Direccion pd = getTableView().getItems().get(getIndex());
@@ -316,11 +335,16 @@ public class AgendaInterfaceController {
         });
     }
 
+    // ========== CAMBIO 3: MODIFICAR cargarPersonas() ==========
     private void cargarPersonas() {
         try {
-            List<Persona> personas = personaDAO.getAll();
+            // CAMBIAR ESTA LÍNEA:
+            // List<Persona> personas = personaDAO.getAll();
 
-            // DEBUG: Imprimir en consola lo que se carga
+            // POR ESTA:
+            List<Persona> personas = personaService.getAllPersonas();
+            // ===========================================================
+
             System.out.println("=== CARGANDO PERSONAS ===");
             System.out.println("Total personas encontradas: " + personas.size());
             for (Persona p : personas) {
@@ -343,16 +367,30 @@ public class AgendaInterfaceController {
         }
     }
 
+    // ========== CAMBIO 4: MODIFICAR agregarPersona() ==========
     private void agregarPersona() {
         String nombre = nameTextField.getText().trim();
 
-        if (nombre.isEmpty()) return;
+        // ELIMINAR ESTA LÍNEA:
+        // if (nombre.isEmpty()) return;
 
         try {
-            Persona nuevaPersona = new Persona(0, nombre);
-            personaDAO.insert(nuevaPersona);
-            cargarPersonas();
-            limpiarCamposPersona();
+            // REEMPLAZAR TODO ESTE BLOQUE:
+            // Persona nuevaPersona = new Persona(0, nombre);
+            // personaDAO.insert(nuevaPersona);
+            // cargarPersonas();
+            // limpiarCamposPersona();
+
+            // POR ESTE:
+            boolean success = personaService.createPersona(nombre);
+
+            if (success) {
+                cargarPersonas();
+                limpiarCamposPersona();
+            } else {
+                System.err.println("No se pudo agregar la persona (validación falló)");
+            }
+            // ===========================================================
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -362,29 +400,51 @@ public class AgendaInterfaceController {
         personaEnEdicion = persona;
         nameTextField.setText(persona.getNombre());
         addPersonButton.setStyle("-fx-background-color: #e67e22; -fx-text-fill: white;");
-
         addPersonButton.setText("Guardar Cambios");
     }
 
+    // ========== CAMBIO 5: MODIFICAR modificarPersona() ==========
     private void modificarPersona() {
         if (personaEnEdicion == null) return;
 
         String nombre = nameTextField.getText().trim();
-        if (nombre.isEmpty()) return;
+
+        // ELIMINAR ESTA LÍNEA:
+        // if (nombre.isEmpty()) return;
 
         try {
-            personaEnEdicion.setNombre(nombre);
-            personaDAO.update(personaEnEdicion);
-            cargarPersonas();
-            limpiarCamposPersona();
+            // REEMPLAZAR ESTE BLOQUE:
+            // personaEnEdicion.setNombre(nombre);
+            // personaDAO.update(personaEnEdicion);
+            // cargarPersonas();
+            // limpiarCamposPersona();
+
+            // POR ESTE:
+            boolean success = personaService.updatePersona(
+                    personaEnEdicion.getId(),
+                    nombre
+            );
+
+            if (success) {
+                cargarPersonas();
+                limpiarCamposPersona();
+            }
+            // ===========================================================
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    // ========== CAMBIO 6: MODIFICAR eliminarPersona() ==========
     private void eliminarPersona(Persona persona) {
         try {
-            personaDAO.delete(persona.getId());
+            // CAMBIAR ESTA LÍNEA:
+            // personaDAO.delete(persona.getId());
+
+            // POR ESTA:
+            personaService.deletePersona(persona.getId());
+            // ===========================================================
+
             cargarPersonas();
             tablaTelefonos.getItems().clear();
         } catch (SQLException e) {
@@ -398,6 +458,8 @@ public class AgendaInterfaceController {
         addPersonButton.setText("Agregar");
         addPersonButton.setStyle("-fx-background-color: #FFFFFF;");
     }
+
+    // ========== TODO LO DEMÁS QUEDA EXACTAMENTE IGUAL ==========
 
     private void agregarTelefono() {
         Persona personaSeleccionada = tablaPersonas.getSelectionModel().getSelectedItem();
@@ -454,10 +516,6 @@ public class AgendaInterfaceController {
         addPhoneButton.setText("Agregar");
         addPhoneButton.setStyle("-fx-background-color: #FFFFFF;");
     }
-
-
-
-
 
     private void activarModoEdicionDirecciones(Direccion direccion) {
         direccionEnEdicion = direccion;
@@ -531,20 +589,10 @@ public class AgendaInterfaceController {
         }
     }
 
-
-
-
-
-
-
-//PARTE FINAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL
-
-
-
     private void eliminarPersona_Direccion(Persona_Direccion pd) {
         try {
             persona_direccionDAO.delete(pd.getId_persona(), pd.getId_direccion());
-            cargarPersonas_Direcciones(); // ← LÍNEA CORREGIDA (antes era cargarDirecciones())
+            cargarPersonas_Direcciones();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -572,7 +620,6 @@ public class AgendaInterfaceController {
         Persona personaSeleccionada = tablaPersonas.getSelectionModel().getSelectedItem();
         Direccion direccionSeleccionada = tablaDirecciones.getSelectionModel().getSelectedItem();
 
-        // Verificar que ambos estén seleccionados
         if (personaSeleccionada == null || direccionSeleccionada == null) {
             System.out.println("ERROR: Debe seleccionar una persona y una dirección");
             return;

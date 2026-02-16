@@ -1,75 +1,54 @@
 package DB;
 
+import repositories.IPersonaRepository;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class PersonaDAO {
+// CAMBIO: Ahora extiende BaseDAO en lugar de tener su propio código
+public class PersonaDAO extends BaseDAO<Persona> implements IPersonaRepository {
 
-    public List<Persona> getAll() throws SQLException {
-        List<Persona> lista = new ArrayList<>();
-
-        String sql = "SELECT id, nombre FROM Personas";
-
-        try (Connection connection = ConnectionDB.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                Persona p = new Persona(
-                        rs.getInt("id"),
-                        rs.getString("nombre")
-                );
-                lista.add(p);
-            }
-        }
-
-        return lista;
+    @Override
+    protected String getTableName() {
+        return "Personas";
     }
 
-    public int insert(Persona persona) throws SQLException {
-        String sql = "INSERT INTO Personas(nombre) VALUES (?)";
-
-        try (Connection conn = ConnectionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, persona.getNombre());
-            ps.executeUpdate();
-
-            ResultSet keys = ps.getGeneratedKeys();
-            if (keys.next()) {
-                int idGenerado = keys.getInt(1);
-
-                // 🔥 ESTA LINEA ES LA IMPORTANTE
-                persona.setId(idGenerado);
-
-                return idGenerado;
-            }
-        }
-        return -1;
+    @Override
+    protected String getIdColumn() {
+        return "id";
     }
 
-    public void update(Persona persona) throws SQLException {
-        String sql = "UPDATE Personas SET nombre = ? WHERE id = ?";
-
-        try (Connection conn = ConnectionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, persona.getNombre());
-            ps.setInt(2, persona.getId());
-
-            ps.executeUpdate();
-        }
+    @Override
+    protected String getInsertColumns() {
+        return "nombre";
     }
 
-    public void delete(int id) throws SQLException {
-        String sql = "DELETE FROM Personas WHERE id = ?";
-
-        try (Connection conn = ConnectionDB.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        }
+    @Override
+    protected String getInsertValues() {
+        return "?";
     }
+
+    @Override
+    protected String getUpdateSet() {
+        return "nombre = ?";
+    }
+
+    @Override
+    protected void setInsertParameters(PreparedStatement ps, Persona persona) throws SQLException {
+        ps.setString(1, persona.getNombre());
+    }
+
+    @Override
+    protected void setUpdateParameters(PreparedStatement ps, Persona persona) throws SQLException {
+        ps.setString(1, persona.getNombre());
+        ps.setInt(2, persona.getId());
+    }
+
+    @Override
+    protected Persona mapRow(ResultSet rs) throws SQLException {
+        return new Persona(
+                rs.getInt("id"),
+                rs.getString("nombre")
+        );
+    }
+
+    // Ahora los hereda de BaseDAO
 }
