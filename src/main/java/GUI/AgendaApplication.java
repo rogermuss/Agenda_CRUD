@@ -1,5 +1,6 @@
 package GUI;
-
+//Al programa realizado en la Meta 1.1 agregarle la funcionalidad de gestionar varias direcciones
+// asociadas a una misma persona y además que varias personas puedan compartir la misma dirección.
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
