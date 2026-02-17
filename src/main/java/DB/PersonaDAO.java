@@ -3,7 +3,6 @@ package DB;
 import repositories.IPersonaRepository;
 import java.sql.*;
 
-// CAMBIO: Ahora extiende BaseDAO en lugar de tener su propio código
 public class PersonaDAO extends BaseDAO<Persona> implements IPersonaRepository {
 
     @Override
@@ -50,5 +49,4 @@ public class PersonaDAO extends BaseDAO<Persona> implements IPersonaRepository {
         );
     }
 
-    // Ahora los hereda de BaseDAO
 }

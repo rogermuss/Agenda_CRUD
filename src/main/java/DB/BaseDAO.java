@@ -5,7 +5,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-// Clase abstracta base que elimina código duplicado
 public abstract class BaseDAO<T> implements IRepository<T> {
 
     // Métodos abstractos que cada DAO específico debe implementar
@@ -77,6 +76,5 @@ public abstract class BaseDAO<T> implements IRepository<T> {
         }
     }
 
-    // Método auxiliar para UPDATE
     protected abstract String getUpdateSet();
 }

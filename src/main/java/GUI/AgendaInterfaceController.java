@@ -64,13 +64,8 @@ public class AgendaInterfaceController {
     @FXML private Button associationButton;
     @FXML private Circle indicator;
 
-    // ========== CAMBIO 1: REEMPLAZAR PersonaDAO por PersonaService ==========
-    // ELIMINAR ESTA LÍNEA:
-    // private final PersonaDAO personaDAO = new PersonaDAO();
 
-    // AGREGAR ESTA LÍNEA:
     private PersonaService personaService;
-    // ========================================================================
 
     // Los demás DAOs quedan igual
     private final TelefonoDAO telefonoDAO = new TelefonoDAO();
@@ -335,15 +330,10 @@ public class AgendaInterfaceController {
         });
     }
 
-    // ========== CAMBIO 3: MODIFICAR cargarPersonas() ==========
     private void cargarPersonas() {
         try {
-            // CAMBIAR ESTA LÍNEA:
-            // List<Persona> personas = personaDAO.getAll();
 
-            // POR ESTA:
             List<Persona> personas = personaService.getAllPersonas();
-            // ===========================================================
 
             System.out.println("=== CARGANDO PERSONAS ===");
             System.out.println("Total personas encontradas: " + personas.size());
@@ -367,21 +357,12 @@ public class AgendaInterfaceController {
         }
     }
 
-    // ========== CAMBIO 4: MODIFICAR agregarPersona() ==========
     private void agregarPersona() {
         String nombre = nameTextField.getText().trim();
 
-        // ELIMINAR ESTA LÍNEA:
-        // if (nombre.isEmpty()) return;
 
         try {
-            // REEMPLAZAR TODO ESTE BLOQUE:
-            // Persona nuevaPersona = new Persona(0, nombre);
-            // personaDAO.insert(nuevaPersona);
-            // cargarPersonas();
-            // limpiarCamposPersona();
 
-            // POR ESTE:
             boolean success = personaService.createPersona(nombre);
 
             if (success) {
@@ -390,7 +371,6 @@ public class AgendaInterfaceController {
             } else {
                 System.err.println("No se pudo agregar la persona (validación falló)");
             }
-            // ===========================================================
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -403,23 +383,15 @@ public class AgendaInterfaceController {
         addPersonButton.setText("Guardar Cambios");
     }
 
-    // ========== CAMBIO 5: MODIFICAR modificarPersona() ==========
     private void modificarPersona() {
         if (personaEnEdicion == null) return;
 
         String nombre = nameTextField.getText().trim();
 
-        // ELIMINAR ESTA LÍNEA:
-        // if (nombre.isEmpty()) return;
+
 
         try {
-            // REEMPLAZAR ESTE BLOQUE:
-            // personaEnEdicion.setNombre(nombre);
-            // personaDAO.update(personaEnEdicion);
-            // cargarPersonas();
-            // limpiarCamposPersona();
 
-            // POR ESTE:
             boolean success = personaService.updatePersona(
                     personaEnEdicion.getId(),
                     nombre
@@ -429,21 +401,15 @@ public class AgendaInterfaceController {
                 cargarPersonas();
                 limpiarCamposPersona();
             }
-            // ===========================================================
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    // ========== CAMBIO 6: MODIFICAR eliminarPersona() ==========
     private void eliminarPersona(Persona persona) {
         try {
-            // CAMBIAR ESTA LÍNEA:
-            // personaDAO.delete(persona.getId());
 
-            // POR ESTA:
             personaService.deletePersona(persona.getId());
-            // ===========================================================
 
             cargarPersonas();
             tablaTelefonos.getItems().clear();
@@ -459,7 +425,6 @@ public class AgendaInterfaceController {
         addPersonButton.setStyle("-fx-background-color: #FFFFFF;");
     }
 
-    // ========== TODO LO DEMÁS QUEDA EXACTAMENTE IGUAL ==========
 
     private void agregarTelefono() {
         Persona personaSeleccionada = tablaPersonas.getSelectionModel().getSelectedItem();
@@ -469,7 +434,7 @@ public class AgendaInterfaceController {
         if (numeroTelefono.isEmpty()) return;
 
         try {
-            Telefono nuevoTelefono = new Telefono(personaSeleccionada.getId(), numeroTelefono);
+            Telefono nuevoTelefono = new Telefono(0,personaSeleccionada.getId(), numeroTelefono);
             telefonoDAO.insert(nuevoTelefono);
             cargarTelefonos(personaSeleccionada.getId());
             limpiarCamposTelefono();
