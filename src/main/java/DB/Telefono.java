@@ -11,10 +11,6 @@ public class Telefono {
         this.telefono = telefono;
     }
 
-    public Telefono(int personaId, String telefono) {
-        this.personaId = personaId;
-        this.telefono = telefono;
-    }
 
 
     public int getId() { return id; }
